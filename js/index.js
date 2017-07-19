@@ -40,7 +40,6 @@ var musicList = [
 ];
 
 var playMusic = null;
-var isPlay = true;
 
 var songList = document.createElement("div");
 songList.className = "musicList";
@@ -56,10 +55,6 @@ songList.innerHTML = str;
 document.body.appendChild(songList);
 
 
-/*document.querySelector(".songInfo").onclick = function(event){
-	console.log(event);
-}*/
-
 var oSongInfo = document.getElementsByClassName("songInfo");
 //给每个歌曲列表添加索引
 for(var i = 0; i < oSongInfo.length; i ++){
@@ -67,12 +62,25 @@ for(var i = 0; i < oSongInfo.length; i ++){
 }
 
 
-//设置当前播放音乐
-var currentMusic = null;
+//设置当前播放音乐，刚进去主页面，当前播放歌曲是music0。
+var currentMusic = document.querySelector("#music0");
+var isPlay = false;
+//点击播放按钮
+document.querySelector("#playRight .icon-play").onclick = function(){
+	if(isPlay){
+		this.className = "iconfont icon-bofang1 icon-play";
+		currentMusic.pause();
+		isPlay = false;
+	}else{
+		this.className = "iconfont icon-bofang icon-play";
+		currentMusic.play();
+		isPlay = true;
+	}
+}
+
 for(var i = 0; i < oSongInfo.length; i ++){
 	
 	for(var j = 0; j < musicList[i].length; j ++){
-		console.log(document.querySelector("#music" + j).src);
 		document.querySelector("#music" + j).pause();
 	}
 	oSongInfo[i].onclick = function(){
@@ -87,7 +95,6 @@ for(var i = 0; i < oSongInfo.length; i ++){
 		playMusic = document.querySelector("#music" + this.index);
 		currentMusic = playMusic;
 		playMusic.play();
-		console.log(this.index);
 		
 		var play = document.getElementById("play");
 		var playLeft = document.getElementById("playLeft");
@@ -95,19 +102,11 @@ for(var i = 0; i < oSongInfo.length; i ++){
 		var playRight = document.getElementById("playRight");
 		playRight.innerHTML = "<span class='iconfont icon-prev'></span><span class='iconfont icon-bofang icon-play'></span><span class='iconfont icon-xiayiqu'></span>";
 		
-		function getPlayLeft(obj){
-			var id = parseInt(obj.id.replace("music",0));
-			var img = playLeft.querySelector("img");
-			img.src = musicList[id].posterImg;
-			var desc = document.getElementById("desc");
-			desc.innerHTML = "<p class='title'>"+ musicList[id].musicName +"</p><p class='author'>"+ musicList[id].author +"</p>";
+		while(currentMusic.currentTime == currentMusic.duration){
+			nextSong();
 		}
 		
-		getPlayLeft(currentMusic);
-		
-		//点击播放按钮
-		document.querySelector("#playRight .icon-play").onclick = function(event){
-			console.log(isPlay);
+		document.querySelector("#playRight .icon-play").onclick = function(){
 			if(isPlay){
 				this.className = "iconfont icon-bofang1 icon-play";
 				currentMusic.pause();
@@ -118,6 +117,16 @@ for(var i = 0; i < oSongInfo.length; i ++){
 				isPlay = true;
 			}
 		}
+		
+		function getPlayLeft(obj){
+			var id = parseInt(obj.id.replace("music",0));
+			var img = playLeft.querySelector("img");
+			img.src = musicList[id].posterImg;
+			var desc = document.getElementById("desc");
+			desc.innerHTML = "<p class='title'>"+ musicList[id].musicName +"</p><p class='author'>"+ musicList[id].author +"</p>";
+		}
+		
+		getPlayLeft(currentMusic);
 		
 		//上一曲的方法
 		var preSong = function(){
@@ -147,7 +156,14 @@ for(var i = 0; i < oSongInfo.length; i ++){
 		//点击上一曲
 		document.querySelector("#playRight .icon-prev").onclick = preSong;
 		document.querySelector("#playRight .icon-xiayiqu").onclick = nextSong;
+		
+		//监听歌曲是否播放完毕
+		currentMusic.onended = nextSong;
+		console.log(currentMusic);
 	}
 	
 }
+
+
+	
 
